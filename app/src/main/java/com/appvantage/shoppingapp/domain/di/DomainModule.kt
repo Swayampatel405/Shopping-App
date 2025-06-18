@@ -1,5 +1,7 @@
 package com.appvantage.shoppingapp.domain.di
 
+import com.appvantage.shoppingapp.data.repo.RepoImpl
+import com.appvantage.shoppingapp.domain.repo.Repo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -12,10 +14,10 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 class DomainModule {
 
-//    @Provides
-//    fun provideRepo(firebaseAuth: FirebaseAuth,firebaseFirestore: FirebaseFirestore):Repo{
-//        return RepoImpl(firebaseAuth,firebaseFirestore)
-//    }
+    @Provides
+    fun provideRepo(firebaseAuth: FirebaseAuth,firebaseFirestore: FirebaseFirestore): Repo {
+        return RepoImpl(firebaseAuth,firebaseFirestore)
+    }
 
 
 }

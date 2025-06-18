@@ -1,6 +1,10 @@
 package com.appvantage.shoppingapp.data.repo
 
 import android.net.Uri
+import com.appvantage.shoppingapp.common.ADD_TO_CART
+import com.appvantage.shoppingapp.common.ADD_TO_FAV
+import com.appvantage.shoppingapp.common.CATEGORIES
+import com.appvantage.shoppingapp.common.PRODUCT_COLLECTION
 import com.appvantage.shoppingapp.common.ResultState
 import com.appvantage.shoppingapp.common.USER_COLLECTION
 import com.appvantage.shoppingapp.domain.models.BannerDataModels
@@ -19,7 +23,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 class RepoImpl @Inject constructor(
-    var firebaseAuth: FirebaseAuth, var firebaseFirestore: FirebaseFirestore
+    private var firebaseAuth: FirebaseAuth, private var firebaseFirestore: FirebaseFirestore
 ) : Repo {
     override fun registerUserWithEmailAndPassword(userData: UserData): Flow<ResultState<String>> =
         callbackFlow {
@@ -131,56 +135,256 @@ class RepoImpl @Inject constructor(
         }
     }
 
-    override fun getCategoriesInLimited(): Flow<ResultState<List<CategoryDataModels>>> {
-        TODO("Not yet implemented")
+    override fun getCategoriesInLimited(): Flow<ResultState<List<CategoryDataModels>>> =
+        callbackFlow {
+            trySend(ResultState.Loading)
+
+            firebaseFirestore.collection(CATEGORIES).limit(7).get().addOnSuccessListener {
+                val categories = it.documents.mapNotNull { document ->
+                    document.toObject(CategoryDataModels::class.java)
+                }
+                trySend(ResultState.Success(categories))
+            }.addOnFailureListener {
+                trySend(ResultState.Error(it.toString()))
+            }
+
+            awaitClose {
+                close()
+            }
+        }
+
+    override fun getProductsInLimited(): Flow<ResultState<List<ProductDataModels>>> = callbackFlow {
+        trySend(ResultState.Loading)
+
+        firebaseFirestore.collection(PRODUCT_COLLECTION).limit(10).get().addOnSuccessListener {
+
+            val products = it.documents.mapNotNull { documents ->
+                documents.toObject(ProductDataModels::class.java)?.apply {
+                    productId = documents.id
+                }
+            }
+
+            trySend(ResultState.Success(products))
+
+        }.addOnFailureListener {
+            trySend(ResultState.Error(it.toString()))
+        }
+
+        awaitClose {
+            close()
+        }
     }
 
-    override fun getProductsInLimited(): Flow<ResultState<List<ProductDataModels>>> {
-        TODO("Not yet implemented")
+    override fun getAllProducts(): Flow<ResultState<List<ProductDataModels>>> = callbackFlow {
+        trySend(ResultState.Loading)
+
+        firebaseFirestore.collection(PRODUCT_COLLECTION).get().addOnSuccessListener {
+            val products = it.documents.mapNotNull { document ->
+                document.toObject(ProductDataModels::class.java)?.apply {
+                    productId = document.id
+                }
+            }
+
+            trySend(ResultState.Success(products))
+        }.addOnFailureListener {
+            trySend(ResultState.Error(it.toString()))
+        }
+        awaitClose {
+            close()
+        }
+
     }
 
-    override fun getAllProducts(): Flow<ResultState<List<ProductDataModels>>> {
-        TODO("Not yet implemented")
+    override fun getProductById(productId: String): Flow<ResultState<ProductDataModels>> =
+        callbackFlow {
+            trySend(ResultState.Loading)
+
+            firebaseFirestore.collection(PRODUCT_COLLECTION).document(productId).get()
+                .addOnSuccessListener {
+                    val product = it.toObject(ProductDataModels::class.java)
+
+                    trySend(ResultState.Success(product!!))
+                }.addOnFailureListener {
+                    trySend(ResultState.Error(it.toString()))
+                }
+
+            awaitClose {
+                close()
+            }
+        }
+
+    override fun addToCarts(cartDataModels: CartDataModels): Flow<ResultState<String>> =
+        callbackFlow {
+
+            trySend(ResultState.Loading)
+
+            firebaseFirestore.collection(ADD_TO_CART).document(firebaseAuth.currentUser!!.uid)
+                .collection("user_cart").add(cartDataModels)
+                .addOnSuccessListener {
+                    trySend(ResultState.Success("Product added to cart successfully"))
+                }.addOnFailureListener {
+                    trySend(ResultState.Error(it.toString()))
+                }
+
+            awaitClose {
+                close()
+            }
+
+        }
+
+    override fun addToFav(productDataModels: ProductDataModels): Flow<ResultState<String>> =
+        callbackFlow {
+            trySend(ResultState.Loading)
+
+            firebaseFirestore.collection(ADD_TO_FAV).document(firebaseAuth.currentUser!!.uid)
+                .collection("user_fav").add(productDataModels).addOnSuccessListener {
+                    trySend(ResultState.Success("Product added to wishlist"))
+                }.addOnFailureListener {
+                    trySend(ResultState.Error(it.toString()))
+                }
+
+            awaitClose {
+                close()
+            }
+        }
+
+    override fun getAllFav(): Flow<ResultState<List<ProductDataModels>>> = callbackFlow {
+        trySend(ResultState.Loading)
+
+        firebaseFirestore.collection(ADD_TO_FAV).document(firebaseAuth.currentUser!!.uid)
+            .collection("user_fav").get()
+            .addOnSuccessListener {
+                val fav = it.documents.mapNotNull {
+                    it.toObject(ProductDataModels::class.java)
+                }
+                trySend(ResultState.Success(fav))
+
+            }.addOnFailureListener {
+                trySend(ResultState.Error(it.toString()))
+            }
+        awaitClose {
+            close()
+        }
     }
 
-    override fun getProductById(productId: String): Flow<ResultState<ProductDataModels>> {
-        TODO("Not yet implemented")
+    override fun getCart(): Flow<ResultState<List<CartDataModels>>> = callbackFlow {
+        trySend(ResultState.Loading)
+
+        firebaseFirestore.collection(ADD_TO_CART).document(firebaseAuth.currentUser!!.uid)
+            .collection("user_cart").get()
+            .addOnSuccessListener {
+                val cart = it.documents.mapNotNull {
+                    it.toObject(CartDataModels::class.java)?.apply {
+                        cartId = it.id
+                    }
+                }
+                trySend(ResultState.Success(cart))
+            }
+            .addOnFailureListener {
+                trySend(ResultState.Error(it.toString()))
+            }
+
+        awaitClose {
+            close()
+        }
     }
 
-    override fun addToCarts(cartDataModels: CartDataModels): Flow<ResultState<String>> {
-        TODO("Not yet implemented")
+    override fun getAllCategories(): Flow<ResultState<List<CategoryDataModels>>> = callbackFlow {
+        trySend(ResultState.Loading)
+
+        firebaseFirestore.collection(CATEGORIES).get().addOnSuccessListener {
+            val categories = it.documents.mapNotNull {
+                it.toObject(CategoryDataModels::class.java)
+            }
+            trySend(ResultState.Success(categories))
+        }.addOnFailureListener {
+            trySend(ResultState.Error(it.toString()))
+        }
+        awaitClose {
+            close()
+        }
     }
 
-    override fun addToFav(productDataModels: ProductDataModels): Flow<ResultState<String>> {
-        TODO("Not yet implemented")
+    override fun getCheckOut(productId: String): Flow<ResultState<ProductDataModels>> =
+        callbackFlow {
+            trySend(ResultState.Loading)
+
+            firebaseFirestore.collection(PRODUCT_COLLECTION).document(productId).get()
+                .addOnSuccessListener {
+                    val product = it.toObject(ProductDataModels::class.java)
+                    trySend(ResultState.Success(product!!))
+
+                }.addOnFailureListener {
+                    trySend(ResultState.Error(it.toString()))
+                }
+
+            awaitClose {
+                close()
+            }
+        }
+
+    override fun getBanner(): Flow<ResultState<List<BannerDataModels>>> = callbackFlow {
+        trySend(ResultState.Loading)
+
+        firebaseFirestore.collection("banner").get()
+            .addOnSuccessListener {
+                val banner = it.documents.mapNotNull {
+                    it.toObject(BannerDataModels::class.java)
+                }
+                trySend(ResultState.Success(banner))
+            }
+            .addOnFailureListener {
+                trySend(ResultState.Error(it.toString()))
+            }
+
+        awaitClose {
+            close()
+        }
     }
 
-    override fun getAllFav(): Flow<ResultState<List<ProductDataModels>>> {
-        TODO("Not yet implemented")
-    }
+    override fun getSpecificCategoryItems(categoryName: String): Flow<ResultState<List<ProductDataModels>>> =
+        callbackFlow {
+            trySend(ResultState.Loading)
 
-    override fun getCart(): Flow<ResultState<List<CartDataModels>>> {
-        TODO("Not yet implemented")
-    }
+            firebaseFirestore.collection(PRODUCT_COLLECTION).whereEqualTo("category", categoryName)
+                .get()
+                .addOnSuccessListener {
+                    val products = it.documents.mapNotNull {
+                        it.toObject(ProductDataModels::class.java)?.apply {
+                            productId = it.id
+                        }
+                    }
+                    trySend(ResultState.Success(products))
+                }
+                .addOnFailureListener {
+                    trySend(ResultState.Error(it.toString()))
 
-    override fun getAllCategories(): Flow<ResultState<List<CategoryDataModels>>> {
-        TODO("Not yet implemented")
-    }
+                }
 
-    override fun getCheckOut(productId: String): Flow<ResultState<ProductDataModels>> {
-        TODO("Not yet implemented")
-    }
+            awaitClose {
+                close()
+            }
+        }
 
-    override fun getBanner(): Flow<ResultState<List<BannerDataModels>>> {
-        TODO("Not yet implemented")
-    }
+    override fun getAllSuggestedProducts(): Flow<ResultState<List<ProductDataModels>>> =
+        callbackFlow {
+            trySend(ResultState.Loading)
 
-    override fun getSpecificCategoryItems(categoryName: String): Flow<ResultState<List<ProductDataModels>>> {
-        TODO("Not yet implemented")
-    }
+            firebaseFirestore.collection(ADD_TO_FAV).document(firebaseAuth.currentUser!!.uid)
+                .collection("user_fav").get()
+                .addOnSuccessListener {
+                    val fav = it.documents.mapNotNull {
+                        it.toObject(ProductDataModels::class.java)
+                    }
+                    trySend(ResultState.Success(fav))
+                }
+                .addOnFailureListener {
+                    trySend(ResultState.Error(it.toString()))
+                }
 
-    override fun getAllSuggestedProducts(): Flow<ResultState<List<ProductDataModels>>> {
-        TODO("Not yet implemented")
-    }
+            awaitClose {
+                close()
+            }
+        }
 
 }
