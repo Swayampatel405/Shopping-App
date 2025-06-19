@@ -28,6 +28,7 @@ import com.appvantage.shoppingapp.domain.usecase.GetUserUseCase
 import com.appvantage.shoppingapp.domain.usecase.LoginUserUseCase
 import com.appvantage.shoppingapp.domain.usecase.UpdateUserDataUseCase
 import com.appvantage.shoppingapp.domain.usecase.UserProfileImageUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.sign
 
-
+@HiltViewModel
 class ShoppingAppViewModel @Inject constructor(
     private val createUserUseCase: CreateUserUseCase,
     private val addToCartUseCase: AddToCartUseCase,
