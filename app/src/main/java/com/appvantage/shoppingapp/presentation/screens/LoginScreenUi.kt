@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,14 +64,13 @@ fun LoginScreenUi(navController: NavController, viewModel: ShoppingAppViewModel 
 
     if (state.value.isLoading) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     } else if (state.value.errorMessages != null) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(text = state.value.errorMessages!!)
-        }
+        Toast.makeText(context, state.value.errorMessages, Toast.LENGTH_SHORT).show()
     } else if (state.value.userData != null) {
         SuccessAlertDialog(
             onClick = { navController.navigate(SubNavigation.MainHomeScreen) }
@@ -100,7 +101,8 @@ fun LoginScreenUi(navController: NavController, viewModel: ShoppingAppViewModel 
                 leadingIcon = Icons.Default.Email,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp, horizontal = 4.dp)
+                    .padding(vertical = 10.dp, horizontal = 4.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
             CustomTextField(
                 value = password,
@@ -110,7 +112,9 @@ fun LoginScreenUi(navController: NavController, viewModel: ShoppingAppViewModel 
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp, horizontal = 4.dp)
+                    .padding(vertical = 10.dp, horizontal = 4.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+
             )
 
             Text(
