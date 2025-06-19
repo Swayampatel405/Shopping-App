@@ -44,6 +44,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.appvantage.shoppingapp.R
+import com.appvantage.shoppingapp.domain.models.UserData
 import com.appvantage.shoppingapp.presentation.navigation.Routes
 import com.appvantage.shoppingapp.presentation.navigation.SubNavigation
 import com.appvantage.shoppingapp.presentation.utils.CustomTextField
@@ -126,13 +127,16 @@ fun LoginScreenUi(navController: NavController, viewModel: ShoppingAppViewModel 
             Button(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
-
+                        val userData = UserData(
+                            firstName = "",
+                            lastName = "",
+                            email = email,
+                            password = password,
+                            phoneNumber = ""
+                        )
+                        viewModel.loginUser(userData = userData)
                     } else {
-                        Toast.makeText(
-                            context,
-                            "Please enter valid Email and Password",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context,"Please enter valid Email and Password", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier

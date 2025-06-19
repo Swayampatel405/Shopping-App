@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appvantage.shoppingapp.R
@@ -37,26 +38,27 @@ fun SuccessAlertDialog(
 
     BasicAlertDialog(
         onDismissRequest = {},
-        modifier = Modifier.background(shape = RoundedCornerShape(16.dp), color = Color.White)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
+        modifier = Modifier.background(shape = RoundedCornerShape(16.dp), color = Color.White),
+        content = {
+            Column(
                 modifier = Modifier
-                    .size(64.dp)
-                    .background(color = colorResource(R.color.orange), shape = CircleShape),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Check",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(32.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(color = colorResource(R.color.orange), shape = CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Check",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -78,7 +80,7 @@ fun SuccessAlertDialog(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = {onClick()},
                     modifier = Modifier
                         .height(48.dp)
                         .fillMaxWidth(),
@@ -86,12 +88,10 @@ fun SuccessAlertDialog(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "Go to Home",
-                        color = Color.Gray
+                        text = "Go to Home", color = Color.Gray
                     )
                 }
 
             }
-        }
-    }
+        })
 }

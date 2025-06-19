@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.appvantage.shoppingapp.R
+import com.appvantage.shoppingapp.domain.models.UserData
 import com.appvantage.shoppingapp.presentation.navigation.Routes
 import com.appvantage.shoppingapp.presentation.navigation.SubNavigation
 import com.appvantage.shoppingapp.presentation.utils.CustomTextField
@@ -168,7 +169,14 @@ fun SignUpScreen(
                 onClick = {
                     if (firstname.isNotEmpty() && lastname.isNotEmpty() && email.isNotEmpty() && phoneNumber.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
                         if (password == confirmPassword) {
-                            Toast.makeText(context, "Password Matched successfully", Toast.LENGTH_SHORT).show()
+                            val userData = UserData(
+                                firstName = firstname,
+                                lastName = lastname,
+                                email = email,
+                                password = password,
+                                phoneNumber = phoneNumber
+                            )
+                            viewModel.createUser(userData = userData)
                         } else {
                             Toast.makeText(context,"Password and Confirm Password doesn't match.",Toast.LENGTH_SHORT).show()
                         }
