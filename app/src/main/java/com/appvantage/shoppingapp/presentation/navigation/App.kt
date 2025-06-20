@@ -194,7 +194,7 @@ fun MyApp(
                     }
                     composable<Routes.EachCategoryItemsScreen> {
                         val category : Routes.EachCategoryItemsScreen =it.toRoute()
-                        EachCategoryProduct(navController = navController, category = category.categoryName)
+                        EachCategoryProduct(navController = navController, categoryName = category.categoryName)
                     }
                     composable<Routes.CheckoutScreen> {
                         val product :Routes.EachProductDetailScreen = it.toRoute()
