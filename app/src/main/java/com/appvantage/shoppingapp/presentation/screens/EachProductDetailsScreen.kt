@@ -111,7 +111,7 @@ fun EachProductDetailScreen(
                 Button(onClick = { navController.popBackStack() }) { Text("Back") }
             }
 
-            getProductByIdState.value.userData == null -> {
+            getProductByIdState.value.userData != null -> {
 
                 val product = getProductByIdState.value.userData!!.copy(productId = productId)
                 Column(
