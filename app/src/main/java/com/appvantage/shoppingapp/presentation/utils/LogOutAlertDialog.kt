@@ -74,7 +74,6 @@ fun LogOutAlertDialog(
 
                 Text(
                     text = "Do you really \n want to log out?",
-                    color = colorResource(R.color.orange),
                     textAlign = TextAlign.Center
                 )
 
@@ -86,11 +85,10 @@ fun LogOutAlertDialog(
 
                 ) {
                     OutlinedButton(
-                        onClick = { onDismiss },
+                        onClick = { onDismiss() },
                         modifier = Modifier
                             .weight(1f)
                             .height(50.dp)
-                            .border(width = 1.dp, color = colorResource(R.color.orange))
                     ) {
                         Text(
                             text = "Cancel",
@@ -101,7 +99,7 @@ fun LogOutAlertDialog(
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Button(
-                        onClick = {onConfirm},
+                        onClick = {onConfirm()},
                         modifier = Modifier
                             .weight(1f)
                             .height(50.dp),
