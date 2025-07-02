@@ -39,6 +39,10 @@ import kotlin.math.sign
 @HiltViewModel
 class ShoppingAppViewModel @Inject constructor(
     private val createUserUseCase: CreateUserUseCase,
+    private val getUserUseCase: GetUserUseCase,
+    private val loginUserUseCase: LoginUserUseCase,
+    private val updateUserDataUseCase: UpdateUserDataUseCase,
+    private val userProfileImageUseCase: UserProfileImageUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val getAllCategoriesUseCase: GetAllCategoryUseCase,
     private val addToFavUseCase: AddToFavUseCase,
@@ -51,11 +55,7 @@ class ShoppingAppViewModel @Inject constructor(
     private val getCheckoutUseCase: GetCheckoutUseCase,
     private val getProductByIdUseCase: GetProductByIdUseCase,
     private val getProductsInLimit: GetProductsInLimit,
-    private val getSpecificCategoryItems: GetSpecificCategoryItems,
-    private val getUserUseCase: GetUserUseCase,
-    private val loginUserUseCase: LoginUserUseCase,
-    private val updateUserDataUseCase: UpdateUserDataUseCase,
-    private val userProfileImageUseCase: UserProfileImageUseCase
+    private val getSpecificCategoryItems: GetSpecificCategoryItems
 ) : ViewModel() {
     private val _signUpScreenState = MutableStateFlow(SignUpScreenState())
     val signUpScreenState = _signUpScreenState.asStateFlow()

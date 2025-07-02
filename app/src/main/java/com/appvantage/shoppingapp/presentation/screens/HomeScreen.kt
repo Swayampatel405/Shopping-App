@@ -125,7 +125,8 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = "Notifications",
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(30.dp),
+                            tint = colorResource(R.color.orange)
                         )
                     }
 
@@ -340,13 +341,13 @@ fun ProductCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "$${product.finalPrice}",
+                        text = "Rs.${product.finalPrice}",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "$${product.price}",
+                        text = "Rs.${product.price}",
                         style = MaterialTheme.typography.titleSmall,
                         textDecoration = TextDecoration.LineThrough,
                         color = Color.Gray

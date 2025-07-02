@@ -137,7 +137,8 @@ fun MyApp(
                                 },
                                 imageVector = bottomNavItem.icon,
                                 label = bottomNavItem.name,
-                                containerColor = Color.Transparent
+                                containerColor = Color.Transparent,
+                                textColor = colorResource(R.color.orange)
                             )
                         }
 

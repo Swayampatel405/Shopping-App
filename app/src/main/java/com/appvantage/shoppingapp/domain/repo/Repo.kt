@@ -17,6 +17,8 @@ interface Repo {
     fun getUserById(uid: String): Flow<ResultState<UserDataParent>>
     fun updateUserData(userDataParent: UserDataParent): Flow<ResultState<String>>
     fun userProfileImage(uri: Uri):Flow<ResultState<String>>
+
+
     fun getCategoriesInLimited(): Flow<ResultState<List<CategoryDataModels>>>
     fun getProductsInLimited(): Flow<ResultState<List<ProductDataModels>>>
     fun getAllProducts(): Flow<ResultState<List<ProductDataModels>>>
