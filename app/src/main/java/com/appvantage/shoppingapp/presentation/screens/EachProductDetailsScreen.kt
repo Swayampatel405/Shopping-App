@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -38,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -66,7 +70,7 @@ fun EachProductDetailScreen(
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var selectedSize by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf(1) }
-    val isFavorite by remember { mutableStateOf(false) }
+    var isFavorite by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getProductById(productId)
@@ -120,18 +124,20 @@ fun EachProductDetailScreen(
                         .padding(inner)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Box(modifier = Modifier.height(300.dp)) {
+                    Box(modifier = Modifier.height(250.dp)) {
                         AsyncImage(
                             model = product.image,
                             contentDescription = null,
                             modifier = Modifier
-                                .fillMaxSize(),
+                                .fillMaxWidth()
+                                .height(250.dp)
+                                .clip(RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
                     }
 
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(8.dp)
                     ) {
                         Text(
                             text = product.name,
@@ -139,10 +145,12 @@ fun EachProductDetailScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Rs ${product.price}",
-                            style = MaterialTheme.typography.headlineSmall,
+                            text = "₹${product.price}",
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(vertical = 8.dp)
+//                            modifier = Modifier.padding(vertical = 8.dp)
                         )
                         Text(
                             text = "Size",
@@ -170,10 +178,10 @@ fun EachProductDetailScreen(
                         Text(
                             text = "Quantity",
                             style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                         )
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
 
@@ -187,13 +195,13 @@ fun EachProductDetailScreen(
                             )
 
                             IconButton(onClick = { quantity++ }) {
-                                Text("+", style = MaterialTheme.typography.headlineSmall)
+                                Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(17.dp))
                             }
                         }
                         Text(
                             text = "Description",
                             style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
                         )
                         Text(text = product.description)
 
@@ -212,6 +220,7 @@ fun EachProductDetailScreen(
                                 viewModel.addToCart(cartDataModels)
                             },
                             modifier = Modifier.fillMaxWidth(),
+                            enabled = selectedSize.isNotEmpty(),
                             colors = ButtonDefaults.buttonColors(colorResource(R.color.orange))
                         ) {
                             Text("Add to Cart")
@@ -230,7 +239,7 @@ fun EachProductDetailScreen(
 
                         OutlinedButton(
                             onClick = {
-                                isFavorite != isFavorite
+                                isFavorite = !isFavorite
                                 viewModel.addToFav(product)
                             },
                             modifier = Modifier
@@ -243,7 +252,7 @@ fun EachProductDetailScreen(
                                     contentDescription = null
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "Add to WishList")
+                                Text(text = if (isFavorite) "Remove from WishList" else "Add to WishList")
                             }
 
                         }
