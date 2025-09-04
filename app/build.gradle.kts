@@ -88,7 +88,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
 
     // this is for payment gateway
-    implementation("com.razorpay:checkout:1.6.41")
+    implementation("com.razorpay:checkout:1.6.40")  
 
 
     //custom bottom nev bar

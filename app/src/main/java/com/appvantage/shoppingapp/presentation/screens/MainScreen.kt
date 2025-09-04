@@ -1,9 +1,7 @@
 package com.appvantage.shoppingapp.presentation.screens
 
-import android.app.Notification
 import android.os.Handler
 import android.os.Looper
-import android.window.SplashScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,14 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,7 +30,8 @@ import com.appvantage.shoppingapp.presentation.navigation.MyApp
 
 @Composable
 fun MainScreen(
-    firebaseAuth: FirebaseAuth
+    firebaseAuth: FirebaseAuth,
+    payTest:()-> Unit
 //    onPayTest:()->Unit
 ) {
     val showSplash = remember { mutableStateOf(true) }
@@ -45,7 +42,7 @@ fun MainScreen(
     if (showSplash.value) {
         SplashScreen()
     } else {
-        MyApp(firebaseAuth)
+        MyApp(firebaseAuth, { payTest() })
     }
 
 }
@@ -53,7 +50,9 @@ fun MainScreen(
 @Composable
 fun SplashScreen() {
     Box(
-        modifier = Modifier.fillMaxSize().background(color = Color.Black),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.Black),
         contentAlignment = Alignment.Center
     ) {
         Column(

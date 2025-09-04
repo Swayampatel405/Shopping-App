@@ -135,6 +135,32 @@ class RepoImpl @Inject constructor(
         }
     }
 
+    override fun getTotalCartAmount(userId: String): Flow<ResultState<Int>> = callbackFlow {
+        trySend(ResultState.Loading)
+
+        val cartRef =
+            firebaseFirestore.collection(ADD_TO_CART).document(userId).collection("user_cart")
+
+        val listenerRegistration = cartRef.addSnapshotListener { snapshot, error ->
+            if(error != null){
+                close(error)
+                return@addSnapshotListener
+            }
+
+            var total =0
+            snapshot?.documents?.forEach {doc->
+                val price = doc.getString("price")?.toInt()?:0
+                val quantity = doc.getString("quantity")?.toInt()?:0
+                total += price.toInt() * quantity.toInt()
+            }
+
+            trySend(ResultState.Success(total))
+        }
+        awaitClose {
+            listenerRegistration.remove()
+        }
+    }
+
     override fun getCategoriesInLimited(): Flow<ResultState<List<CategoryDataModels>>> =
         callbackFlow {
             trySend(ResultState.Loading)
@@ -236,8 +262,12 @@ class RepoImpl @Inject constructor(
         callbackFlow {
             trySend(ResultState.Loading)
 
+            val uid = firebaseAuth.currentUser!!.uid
+
             firebaseFirestore.collection(ADD_TO_FAV).document(firebaseAuth.currentUser!!.uid)
-                .collection("user_fav").add(productDataModels).addOnSuccessListener {
+                .collection("user_fav")
+                .add(productDataModels)
+                .addOnSuccessListener {
                     trySend(ResultState.Success("Product added to wishlist"))
                 }.addOnFailureListener {
                     trySend(ResultState.Error(it.toString()))
@@ -386,5 +416,4 @@ class RepoImpl @Inject constructor(
                 close()
             }
         }
-
 }

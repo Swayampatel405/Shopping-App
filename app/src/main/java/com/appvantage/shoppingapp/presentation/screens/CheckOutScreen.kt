@@ -53,7 +53,8 @@ import com.appvantage.shoppingapp.presentation.viewmodel.ShoppingAppViewModel
 fun CheckOutScreen(
     navController: NavController,
     productId: String,
-    viewModel: ShoppingAppViewModel = hiltViewModel()
+    viewModel: ShoppingAppViewModel = hiltViewModel(),
+    pay:()-> Unit
 ) {
     val state = viewModel.getProductByIdState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -278,7 +279,9 @@ fun CheckOutScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
-                            onClick = {},
+                            onClick = {
+                                pay.invoke()
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(colorResource(R.color.orange))
                         ){

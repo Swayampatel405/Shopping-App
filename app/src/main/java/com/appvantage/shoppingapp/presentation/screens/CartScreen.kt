@@ -1,5 +1,7 @@
 package com.appvantage.shoppingapp.presentation.screens
 
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +30,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -41,6 +44,7 @@ import androidx.navigation.NavController
 import com.appvantage.shoppingapp.R
 import com.appvantage.shoppingapp.presentation.utils.CartItemCard
 import com.appvantage.shoppingapp.presentation.viewmodel.ShoppingAppViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,9 +55,12 @@ fun CartScreen(
     val state = viewModel.getCartState.collectAsStateWithLifecycle()
     val cartItems = state.value.userData ?: emptyList()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    val total = viewModel.getCartTotalState.collectAsState().value
 
     LaunchedEffect(Unit) {
         viewModel.getCart()
+        viewModel.getCartTotal(userId.toString())
     }
 
     Scaffold(
@@ -80,11 +87,13 @@ fun CartScreen(
                 scrollBehavior = scrollBehavior
             )
         }
-    ) {innerPadding->
+    ) { innerPadding ->
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
-        ){
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             when {
                 state.value.isLoading -> {
                     Box(
@@ -104,47 +113,89 @@ fun CartScreen(
                     }
                 }
 
-                cartItems.isEmpty()->{
+                cartItems.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
-                    ){
+                    ) {
                         Text("No Products Available")
                     }
                 }
-                else->{
-                    Column (
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
-                    ){
+
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                    ) {
                         Row(
                             modifier = Modifier.padding(vertical = 8.dp)
                         ) {
-                            Text(text = "Items", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "Items",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
 
                             Spacer(modifier = Modifier.weight(.45f))
 
-                            Text(text = "Details", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "Details",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
 
                             Spacer(modifier = Modifier.weight(1f))
 
-                            Text(text = "QTY", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "QTY",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
 
                             Spacer(modifier = Modifier.weight(.15f))
                         }
 
-                        LazyColumn (
-                            modifier = Modifier.fillMaxSize().weight(.6f),
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .weight(.6f),
 
-                        ){
-                            items(cartItems){item->
+                            ) {
+                            items(cartItems) { item ->
                                 CartItemCard(item = item!!)
                             }
                         }
-                        HorizontalDivider(modifier = Modifier.padding(top=16.dp, bottom = 8.dp))
+                        HorizontalDivider(modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp, horizontal = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Total",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Log.d("UI Total", "Total: ${total.userData}")
+                            Text(
+                                text =
+                                    if (total.userData != null) {
+                                        "Rs.${total.userData}"
+                                    } else {
+                                        "Rs.0"
+                                    },
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
 
+                        }
                         Button(
                             onClick = { /*TODO*/ },
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 5.dp),
                             enabled = cartItems.isNotEmpty(),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(colorResource(R.color.orange))

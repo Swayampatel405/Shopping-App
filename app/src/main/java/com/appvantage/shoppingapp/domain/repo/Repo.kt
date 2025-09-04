@@ -18,7 +18,6 @@ interface Repo {
     fun updateUserData(userDataParent: UserDataParent): Flow<ResultState<String>>
     fun userProfileImage(uri: Uri):Flow<ResultState<String>>
 
-
     fun getCategoriesInLimited(): Flow<ResultState<List<CategoryDataModels>>>
     fun getProductsInLimited(): Flow<ResultState<List<ProductDataModels>>>
     fun getAllProducts(): Flow<ResultState<List<ProductDataModels>>>
@@ -32,4 +31,5 @@ interface Repo {
     fun getBanner():Flow<ResultState<List<BannerDataModels>>>
     fun getSpecificCategoryItems(categoryName: String):Flow<ResultState<List<ProductDataModels>>>
     fun getAllSuggestedProducts():Flow<ResultState<List<ProductDataModels>>>
+    fun getTotalCartAmount(userId:String):Flow<ResultState<Int>>
 }

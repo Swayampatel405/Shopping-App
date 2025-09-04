@@ -59,7 +59,8 @@ data class BottomNavItem(val name: String, val icon: ImageVector, val unSelected
 
 @Composable
 fun MyApp(
-    firebaseAuth: FirebaseAuth
+    firebaseAuth: FirebaseAuth,
+    payTest:()-> Unit
 ) {
     val navController = rememberNavController()
     val selectedItem = remember { mutableIntStateOf(0) }
@@ -199,7 +200,7 @@ fun MyApp(
                     }
                     composable<Routes.CheckoutScreen> {
                         val product :Routes.EachProductDetailScreen = it.toRoute()
-                        CheckOutScreen(navController = navController,productId = product.productId)
+                        CheckOutScreen(navController = navController,productId = product.productId, pay = payTest)
                     }
 
                 }
