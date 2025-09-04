@@ -244,11 +244,36 @@ class RepoImpl @Inject constructor(
 
             trySend(ResultState.Loading)
 
-            firebaseFirestore.collection(ADD_TO_CART).document(firebaseAuth.currentUser!!.uid)
-                .collection("user_cart").add(cartDataModels)
+            val uid = firebaseAuth.currentUser?.uid
+
+            if (uid == null) {
+                trySend(ResultState.Error("User not logged in"))
+                close()
+                return@callbackFlow
+            }
+
+            val cartDoc = firebaseFirestore.collection(ADD_TO_CART)
+                .document(uid.toString())
+                .collection("user_cart")
+                .document(cartDataModels.productId!!) // productId as doc id
+
+            firebaseFirestore.runTransaction { tx ->
+                val snapshot = tx.get(cartDoc)
+                if (snapshot.exists()) {
+                    // already in cart → increment quantity (stored as String)
+                    val currentQtyStr = snapshot.getString("quantity") ?: "0"
+                    val currentQty = currentQtyStr.toIntOrNull() ?: 0
+                    tx.update(cartDoc, "quantity", (currentQty + 1).toString())
+                } else {
+                    // not in cart → create new doc with quantity = "1"
+                    val newCartItem = cartDataModels.copy(quantity = "1")
+                    tx.set(cartDoc, newCartItem)
+                }
+            }
                 .addOnSuccessListener {
-                    trySend(ResultState.Success("Product added to cart successfully"))
-                }.addOnFailureListener {
+                    trySend(ResultState.Success("Product added/updated in cart"))
+                }
+                .addOnFailureListener {
                     trySend(ResultState.Error(it.toString()))
                 }
 
@@ -264,12 +289,16 @@ class RepoImpl @Inject constructor(
 
             val uid = firebaseAuth.currentUser!!.uid
 
-            firebaseFirestore.collection(ADD_TO_FAV).document(firebaseAuth.currentUser!!.uid)
+            val favDoc = firebaseFirestore.collection(ADD_TO_FAV)
+                .document(uid)
                 .collection("user_fav")
-                .add(productDataModels)
+                .document(productDataModels.productId!!)
+
+            favDoc.set(productDataModels)
                 .addOnSuccessListener {
                     trySend(ResultState.Success("Product added to wishlist"))
-                }.addOnFailureListener {
+                }
+                .addOnFailureListener {
                     trySend(ResultState.Error(it.toString()))
                 }
 
